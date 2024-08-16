@@ -147,6 +147,57 @@ namespace HarmonyLib
 		///
 		public static CodeInstruction Call(LambdaExpression expression) => new(OpCodes.Call, SymbolExtensions.GetMethodInfo(expression));
 
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="type">The class/type where the method is declared</param>
+		/// <param name="name">The name of the method (case sensitive)</param>
+		/// <param name="parameters">Optional parameters to target a specific overload of the method</param>
+		/// <param name="generics">Optional list of types that define the generic version of the method</param>
+		/// <returns>A code instruction that calls the method matching the arguments</returns>
+		///
+		public static CodeInstruction CallVir(Type type, string name, Type[] parameters = null, Type[] generics = null)
+		{
+			var method = AccessTools.Method(type, name, parameters, generics);
+			if (method is null) throw new ArgumentException($"No method found for type={type}, name={name}, parameters={parameters.Description()}, generics={generics.Description()}");
+			return new CodeInstruction(OpCodes.Callvirt, method);
+		}
+
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="typeColonMethodname">The target method in the form <c>TypeFullName:MethodName</c>, where the type name matches a form recognized by <a href="https://docs.microsoft.com/en-us/dotnet/api/system.type.gettype">Type.GetType</a> like <c>Some.Namespace.Type</c>.</param>
+		/// <param name="parameters">Optional parameters to target a specific overload of the method</param>
+		/// <param name="generics">Optional list of types that define the generic version of the method</param>
+		/// <returns>A code instruction that calls the method matching the arguments</returns>
+		///
+		public static CodeInstruction CallVir(string typeColonMethodname, Type[] parameters = null, Type[] generics = null)
+		{
+			var method = AccessTools.Method(typeColonMethodname, parameters, generics);
+			if (method is null) throw new ArgumentException($"No method found for {typeColonMethodname}, parameters={parameters.Description()}, generics={generics.Description()}");
+			return new CodeInstruction(OpCodes.Callvirt, method);
+		}
+
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="expression">The lambda expression using the method</param>
+		/// <returns></returns>
+		///
+		public static CodeInstruction CallVir(Expression<Action> expression) => new(OpCodes.Callvirt, SymbolExtensions.GetMethodInfo(expression));
+
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="expression">The lambda expression using the method</param>
+		/// <returns></returns>
+		///
+		public static CodeInstruction CallVir<T>(Expression<Action<T>> expression) => new(OpCodes.Callvirt, SymbolExtensions.GetMethodInfo(expression));
+
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="expression">The lambda expression using the method</param>
+		/// <returns></returns>
+		///
+		public static CodeInstruction CallVir<T, TResult>(Expression<Func<T, TResult>> expression) => new(OpCodes.Callvirt, SymbolExtensions.GetMethodInfo(expression));
+
+		/// <summary>Creates a CodeInstruction calling a method (CALL VIR)</summary>
+		/// <param name="expression">The lambda expression using the method</param>
+		/// <returns></returns>
+		///
+		public static CodeInstruction CallVir(LambdaExpression expression) => new(OpCodes.Callvirt, SymbolExtensions.GetMethodInfo(expression));
+
 		/// <summary>Returns an instruction to call the specified closure</summary>
 		/// <typeparam name="T">The delegate type to emit</typeparam>
 		/// <param name="closure">The closure that defines the method to call</param>
